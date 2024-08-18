@@ -1,10 +1,11 @@
-import { Image, ScrollView, StyleSheet, Text, View } from "react-native";
+import { Alert, Image, ScrollView, StyleSheet, Text, View } from "react-native";
 import React, { useState } from "react";
 import { images } from "../../constants";
 import { SafeAreaView } from "react-native-safe-area-context";
 import FormField from "../../components/FormField";
 import CustomButton from "../../components/CustomButton";
 import { Link } from "expo-router";
+import { signIn } from "../../lib/appwrite";
 
 const SignIn = () => {
   const [form, setForm] = useState({
@@ -12,7 +13,25 @@ const SignIn = () => {
     password: "",
   });
   const [loading, setLoading] = useState(false);
-  const submit = () => {};
+  const submit = async () => {
+    if (!form.email || !form.password) {
+      Alert.alert("Error", "Please fill all the fields");
+    }
+    if (form.password.length < 8) {
+      Alert.alert("Error", "Password must be atleast 8 characters long");
+    }
+    setLoading(true);
+    try {
+      const result = await signIn(form.email, form.password);
+      //set it in the global context
+      router.replace("/home");
+    } catch (error) {
+      console.log(error);
+      Alert.alert("Error", "Error in signing in");
+    } finally {
+      setLoading(false);
+    }
+  };
   return (
     <SafeAreaView className="bg-primary h-full">
       <ScrollView>
@@ -28,12 +47,13 @@ const SignIn = () => {
           <FormField
             title="Email"
             value={form.email}
-            handlChangeText={(e) => setForm({ ...form, email: e })}
+            handleChangeText={(e) => setForm({ ...form, email: e })}
             otherStyles="mt-7"
             keyboardType="email-address"
           />
           <FormField
-            title="Passwrord"
+            title="Password"
+            type="Password"
             value={form.password}
             handleChangeText={(e) => setForm({ ...form, password: e })}
             otherStyles="mt-7"
