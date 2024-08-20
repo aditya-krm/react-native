@@ -13,9 +13,6 @@ export const GlobalProvider = ({ children }) => {
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    // check if user is logged in
-    // if logged in set user
-    // else set user to null
     getCurrentUser()
       .then((res) => {
         if (res) {
